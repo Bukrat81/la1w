@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BuyTech</title>
+  <header>
+      <label class="theme-toggle">
+     <input type="checkbox" id="theme-toggle-checkbox" />
+      <span>🌙/☀️</span>
+      </label>
+  </header>
+  <style>
+    :root {
+  --bg-color: #0a0f2c;
+  --header-color: #111c3b;
+  --text-color: #f0f0f0;
+  --card-bg: #162447;
+  --shadow: rgba(0, 120, 255, 0.3);
+  --hover-shadow: rgba(0, 200, 255, 0.5);
+  --price-color: #aad8ff;
+  --price-hover: #00ff88;
+}
+
+body.light {
+  --bg-color: #f4f4f4;
+  --header-color: #ffffff;
+  --text-color: #111;
+  --card-bg: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --hover-shadow: rgba(0, 0, 0, 0.2);
+  --price-color: #0055cc;
+  --price-hover: #008800;
+}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      overflow-x: hidden;
+      background-color: #0a0f2c;
+      color: #f0f0f0;
+        background-color: var(--bg-color);
+  color: var(--text-color);
+    }
+    header {
+       background-color: var(--header-color);
+      padding: 1em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #111c3b;
+    
+    }
+    .language-select {
+      color: white;
+      background-color: #1a2b50;
+      border: 1px solid #2e4a7c;
+      padding: 0.5em;
+    }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1em;
+      padding: 1em;
+      background-color: #0a0f2c;
+    }
+    .product {
+        background-color: var(--card-bg);
+  box-shadow: 0 0 15px var(--shadow);
+      background-color: #162447;
+      box-shadow: 0 0 15px rgba(0, 120, 255, 0.3);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .product:hover {
+      transform: scale(1.05);
+        box-shadow: 0 0 25px var(--hover-shadow);
+      box-shadow: 0 0 25px rgba(0, 200, 255, 0.5);
+    }
+    .product img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+    .product h2, .product p {
+      padding: 0.5em;
+    }
+    .price {
+      color: #aad8ff;
+      transition: color 0.3s;
+        color: var(--price-color);
+      padding: 0.5em;
+    }
+    title {
+      color: #162447;
+    }
+    .price:hover {
+      color: #00ff88;
+        color: var(--price-hover);
+    }
+    .background-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 0.2;
+    }
+    .chatbot {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #222;
+      border: 1px solid #444;
+      border-radius: 10px;
+      width: 300px;
+      padding: 1em;
+    }
+    .chatbot input {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 1em;
+      border-radius: 5px;
+      border: none;
+    }
+    .search-bar {
+      margin: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .search-bar input {
+      padding: 10px;
+      font-size: 16px;
+      width: 300px;
+    }
+    .search-bar button {
+      padding: 10px;
+      font-size: 16px;
+      background-color: #004080;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .notification {
+      text-align: center;
+      color: red;
+      display: none;
+      margin-top: 10px;
+    }
+    
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 1em;
+  color: var(--text-color);
+}
+  </style>
+</head>
+<body>
+  <video class="background-video" autoplay loop muted>
+    <source src="https://media.giphy.com/media/3o7btPjWcGC8iKTyiQ/giphy.mp4" type="video/mp4">
+  </video>
+  <header>
+    <h1 id="title">Tech Store</h1>
+    <select class="language-select" id="language-select">
+      <option value="en">English</option>
+      <option value="az">Azerbaijani</option>
+      <option value="ru">Russian</option>
+    </select>
+  </header>
+
+  <!-- Search bar -->
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Search products..." />
+    <button onclick="handleSearch()">Search</button>
+  </div>
+  <div class="notification" id="notification">No matching product found.</div>
+
+  <div class="products" id="product-list"></div>
+
+  <div class="chatbot">
+    <div id="chat-log">Hello! How can I help you?</div>
+    <input type="text" placeholder="Type your question..." />
+  </div>
+
+  <script>
+    const products = [
+      {
+        name: { en: "iPhone 15 Pro", az: "iPhone 15 Pro", ru: "iPhone 15 Pro" },
+        priceUSD: 999,
+        image: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-model-unselect-gallery-2-202309?wid=5120&hei=2880&fmt=jpeg&qlt=90&.v=1693346855053",
+        wiki: "https://en.wikipedia.org/wiki/IPhone_15"
+      },
+      {
+        name: { en: "Xiaomi Smartwatch", az: "Xiaomi Ağıllı Saat", ru: "Xiaomi Умные часы" },
+        priceUSD: 250,
+        image: "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-watch-2-pro-1.jpg",
+        wiki: "https://en.wikipedia.org/wiki/Xiaomi"
+      }
+    ];
+
+    const exchangeRates = { manat: 1.7, ruble: 90 };
+    const productList = document.getElementById("product-list");
+    const langSelect = document.getElementById("language-select");
+
+    function renderProducts(language) {
+      productList.innerHTML = "";
+      products.forEach(product => {
+        const priceManat = (product.priceUSD * exchangeRates.manat).toFixed(2);
+        const priceRuble = (product.priceUSD * exchangeRates.ruble).toFixed(2);
+
+        const productEl = document.createElement("div");
+        productEl.className = "product";
+        productEl.innerHTML = `
+          <a href="${product.wiki}" target="_blank">
+            <img src="${product.image}" alt="${product.name[language]}" />
+          </a>
+          <h2>${product.name[language]}</h2>
+          <p class="price">$${product.priceUSD} / ${priceManat}₼ / ${priceRuble}₽</p>
+        `;
+        productList.appendChild(productEl);
+      });
+    }
+
+    langSelect.addEventListener("change", () => {
+      const lang = langSelect.value;
+      renderProducts(lang);
+    });
+
+    renderProducts("en");
+
+    products.push(
+      {
+        name: { en: "MacBook Air M3", az: "MacBook Air M3", ru: "MacBook Air M3" },
+        priceUSD: 1299,
+        image: "https://www.apple.com/newsroom/images/2024/03/apple-unveils-the-new-13-and-15-inch-macbook-air-with-the-powerful-m3-chip/article/Apple-MacBook-Air-2-up-hero-240304_big.jpg.large_2x.jpg",
+        wiki: "https://en.wikipedia.org/wiki/MacBook_Air"
+      },
+      {
+        name: { en: "Samsung Galaxy S24 Ultra", az: "Samsung Galaxy S24 Ultra", ru: "Samsung Galaxy S24 Ultra" },
+        priceUSD: 1199,
+        image: "https://image-us.samsung.com/us/smartphones/galaxy-s24/all-gallery/01_E3_TitaniumBlack_Lockup_1600x1200.jpg?$product-details-jpg$?$product-details-thumbnail-jpg$",
+        wiki: "https://en.wikipedia.org/wiki/Samsung_Galaxy_S"
+      },
+      {
+        name: { en: "PlayStation 5", az: "PlayStation 5", ru: "PlayStation 5" },
+        priceUSD: 499,
+        image: "https://store.sony.com.au/dw/image/v2/ABBC_PRD/on/demandware.static/-/Sites-sony-master-catalog/default/dw1b537bbb/images/PLAYSTATION5W/PLAYSTATION5W.png",
+        wiki: "https://en.wikipedia.org/wiki/PlayStation_5"
+      },
+      {
+        name: { en: "ASUS ROG Gaming Laptop", az: "ASUS ROG Oyun Noutbuku", ru: "Игровой ноутбук ASUS ROG" },
+        priceUSD: 1499,
+        image: "https://th.bing.com/th/id/R.bdec1f7a77ed6c72ab2ccb78c9aabbdb?rik=1HuMSiZ7JAw3og&pid=ImgRaw&r=0",
+        wiki: "https://en.wikipedia.org/wiki/Asus_ROG"
+      }
+    );
+
+    function handleSearch() {
+      const lang = document.getElementById("language-select").value;
+      const val = document.getElementById("search").value.toLowerCase();
+      const keywordsByLang = {
+        en: ["pavilion", "macbook", "iphone", "huawei", "xiaomi", "oculus", "vive", "ray-ban", "google", "playstation", "asus"],
+        az: ["pavilion", "macbook", "iphone", "huawei", "xiaomi", "oculus", "vive", "ray-ban", "google", "playstation", "asus"],
+        ru: ["pavilion", "macbook", "iphone", "huawei", "xiaomi", "oculus", "vive", "ray-ban", "google", "playstation", "asus"]
+      };
+      const keywords = keywordsByLang[lang];
+      const valid = keywords.some(k => val.includes(k));
+      document.getElementById("notification").style.display = valid ? "none" : "block";
+    }
+    const toggle = document.getElementById("theme-toggle-checkbox");
+
+toggle.addEventListener("change", () => {
+  document.body.classList.toggle("light");
+});
+  </script>
+</body>
+</html>
