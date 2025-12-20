@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BuyTech</title>
+  <header>
+      <label class="theme-toggle">
+     <input type="checkbox" id="theme-toggle-checkbox" />
+      <span>🌙/☀️</span>
+      </label>
+  </header>
+  <style>
+    :root {
+  --bg-color: #0a0f2c;
+  --header-color: #111c3b;
+  --text-color: #f0f0f0;
+  --card-bg: #162447;
+  --shadow: rgba(0, 120, 255, 0.3);
+  --hover-shadow: rgba(0, 200, 255, 0.5);
+  --price-color: #aad8ff;
+  --price-hover: #00ff88;
+}
+
+body.light {
+  --bg-color: #f4f4f4;
+  --header-color: #ffffff;
+  --text-color: #111;
+  --card-bg: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --hover-shadow: rgba(0, 0, 0, 0.2);
+  --price-color: #0055cc;
+  --price-hover: #008800;
+}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      overflow-x: hidden;
+      background-color: #0a0f2c;
+      color: #f0f0f0;
+        background-color: var(--bg-color);
+  color: var(--text-color);
+    }
+    header {
+       background-color: var(--header-color);
+      padding: 1em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #111c3b;
+    
+    }
+    .language-select {
+      color: white;
+      background-color: #1a2b50;
+      border: 1px solid #2e4a7c;
+      padding: 0.5em;
+    }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1em;
+      padding: 1em;
+      background-color: #0a0f2c;
+    }
+    .product {
+        background-color: var(--card-bg);
+  box-shadow: 0 0 15px var(--shadow);
+      background-color: #162447;
+      box-shadow: 0 0 15px rgba(0, 120, 255, 0.3);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .product:hover {
+      transform: scale(1.05);
+        box-shadow: 0 0 25px var(--hover-shadow);
+      box-shadow: 0 0 25px rgba(0, 200, 255, 0.5);
+    }
+    .product img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+    .product h2, .product p {
+      padding: 0.5em;
+    }
+    .price {
+      color: #aad8ff;
+      transition: color 0.3s;
+        color: var(--price-color);
+      padding: 0.5em;
+    }
+    title {
+      color: #162447;
+    }
+    .price:hover {
+      color: #00ff88;
+        color: var(--price-hover);
+    }
+    .background-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 0.2;
+    }
+    .chatbot {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #222;
+      border: 1px solid #444;
+      border-radius: 10px;
+      width: 300px;
+      padding: 1em;
+    }
+    .chatbot input {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 1em;
+      border-radius: 5px;
+      border: none;
+    }
+    .search-bar {
+      margin: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .search-bar input {
+      padding: 10px;
+      font-size: 16px;
+      width: 300px;
+    }
+    .search-bar button {
+      padding: 10px;
+      font-size: 16px;
+      background-color: #004080;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .notification {
+      text-align: center;
+      color: red;
+      display: none;
+      margin-top: 10px;
+    }
+    
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 1em;
+  color: var(--text-color);
+}
+  </style>
+</head>
+<body>
+  <video class="background-video" autoplay loop muted>
+    <source src="https://media.giphy.com/media/3o7btPjWcGC8iKTyiQ/giphy.mp4" type="video/mp4">
+  </video>
+  <header>
+    <h1 id="title">Tech Store</h1>
+    <select class="language-select" id="language-select">
+      <option value="en">English</option>
+      <option value="az">Azerbaijani</option>
+      <option value="ru">Russian</option>
+    </select>
+  </header>
+
+  <!-- Search bar -->
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Search products..." />
+    <button onclick="handleSearch()">Search</button>
+  </div>
+  <div class="notification" id="notification">No matching product found.</div>
+
+  <div class="products" id="product-list"></div>
+
+  <div class="chatbot">
+    <div id="chat-log">Hello! How can I help you?</div>
+    <input type="text" placeholder="Type your question..." />
+  </div>
+
+  <script>
+    const products = [
+      {
+        name: { en: "iPhone 15 Pro", az: "iPhone 15 Pro", ru: "iPhone 15 Pro" },
+        priceUSD: 999,
+        image: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-model-unselect-gallery-2-202309?wid=5120&hei=2880&fmt=jpeg&qlt=90&.v=1693346855053",
+        wiki: "https://en.wikipedia.org/wiki/IPhone_15"
+      },
+      {
+        name: { en: "Xiaomi Smartwatch", az: "Xiaomi Ağıllı Saat", ru: "Xiaomi Умные часы" },
+        priceUSD: 250,
+        image: "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-watch-2-pro-1.jpg",
+        wiki: "https://en.wikipedia.org/wiki/Xiaomi"
+      }
+    ];
+
+    const exchangeRates = { manat: 1.7, ruble: 90 };
+    const productList = document.getElementById("product-list");
+    const langSelect = document.getElementById("language-select");
+
+    function renderProducts(language) {
+      productList.innerHTML = "";
+      products.forEach(product => {
+        const priceManat = (product.priceUSD * exchangeRates.manat).toFixed(2);
+        const priceRuble = (product.priceUSD * exchangeRates.ruble).toFixed(2);
+
+        const productEl = document.createElement("div");
+        productEl.className = "product";
+        productEl.innerHTML = `
+          <a href="${product.wiki}" target="_blank">
+            <img src="${product.image}" alt="${product.name[language]}" />
+          </a>
+          <h2>${product.name[language]}</h2>
+          <p class="price">$${product.priceUSD} / ${priceManat}₼ / ${priceRuble}₽</p>
+        `;
+        productList.appendChild(productEl);
+      });
+    }
+
+    langSelect.addEventListener("change", () => {
+      const lang = langSelect.value;
+      renderProducts(lang);
+    });
+
+    renderProducts("en");
+
+    // Add all products with working image URLs
+    products.push(
+      {
+        name: { en: "MacBook Air M3", az: "MacBook Air M3", ru: "MacBook Air M3" },
+        priceUSD: 1299,
+        image: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWFjYm9vayUyMGFpcnxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/MacBook_Air"
+      },
+      {
+        name: { en: "Samsung Galaxy S24 Ultra", az: "Samsung Galaxy S24 Ultra", ru: "Samsung Galaxy S24 Ultra" },
+        priceUSD: 1199,
+        image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2Ftc3VuZyUyMHN8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Samsung_Galaxy_S"
+      },
+      {
+        name: { en: "PlayStation 5", az: "PlayStation 5", ru: "PlayStation 5" },
+        priceUSD: 499,
+        image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGxheXN0YXRpb24lMjA1fGVufDB8fDB8fHww&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/PlayStation_5"
+      },
+      {
+        name: { en: "ASUS ROG Gaming Laptop", az: "ASUS ROG Oyun Noutbuku", ru: "Игровой ноутбук ASUS ROG" },
+        priceUSD: 1499,
+        image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Z2FtaW5nJTIwbGFwdG9wfGVufDB8fDB8fHww&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Asus_ROG"
+      },
+      {
+        name: { en: "DJI Mavic 3 Drone", az: "DJI Mavic 3 Dron", ru: "Дрон DJI Mavic 3" },
+        priceUSD: 1599,
+        image: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJvbmV8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/DJI_Mavic_3"
+      },
+      {
+        name: { en: "Nintendo Switch OLED", az: "Nintendo Switch OLED", ru: "Nintendo Switch OLED" },
+        priceUSD: 349,
+        image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bmludGVuZG8lMjBzd2l0Y2h8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Nintendo_Switch"
+      },
+      {
+        name: { en: "Bose QuietComfort 45", az: "Bose QuietComfort 45", ru: "Наушники Bose QuietComfort 45" },
+        priceUSD: 329,
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Bose_Corporation"
+      },
+      {
+        name: { en: "LG OLED C3 TV", az: "LG OLED C3 Televizor", ru: "Телевизор LG OLED C3" },
+        priceUSD: 1399,
+        image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8b2xlZCUyMHR2fGVufDB8fDB8fHww&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/LG_OLED_TV"
+      },
+      {
+        name: { en: "Logitech MX Keys", az: "Logitech MX Keys Klaviatura", ru: "Клавиатура Logitech MX Keys" },
+        priceUSD: 99,
+        image: "https://images.unsplash.com/photo-1541140532154-b024d705b90a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8a2V5Ym9hcmR8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Logitech_MX"
+      },
+      {
+        name: { en: "iPad Pro M2", az: "iPad Pro M2", ru: "iPad Pro M2" },
+        priceUSD: 1099,
+        image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aXBhZHxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/IPad_Pro"
+      },
+      {
+        name: { en: "Meta Quest 3", az: "Meta Quest 3", ru: "Meta Quest 3" },
+        priceUSD: 499,
+        image: "https://images.unsplash.com/photo-1593118247619-e2d6f056869e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dnIlMjBoZWFkc2V0fGVufDB8fDB8fHww&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Meta_Quest_3"
+      },
+      {
+        name: { en: "Canon EOS R5", az: "Canon EOS R5 Fotoaparat", ru: "Фотоаппарат Canon EOS R5" },
+        priceUSD: 3899,
+        image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2FtZXJhfGVufDB8fDB8fHww&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Canon_EOS_R5"
+      },
+      {
+        name: { en: "Razer Blade 15", az: "Razer Blade 15 Noutbuk", ru: "Ноутбук Razer Blade 15" },
+        priceUSD: 2299,
+        image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGFwdG9wfGVufDB8fDB8fHww&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Razer_Blade"
+      },
+      {
+        name: { en: "Amazon Echo Studio", az: "Amazon Echo Studio", ru: "Amazon Echo Studio" },
+        priceUSD: 199,
+        image: "https://images.unsplash.com/photo-1589003077984-894e133dabab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c21hcnQlMjBzcGVha2VyfGVufDB8fDB8fHww&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Amazon_Echo"
+      },
+      {
+        name: { en: "Xbox Series X", az: "Xbox Series X", ru: "Xbox Series X" },
+        priceUSD: 499,
+        image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8eGJveHxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Xbox_Series_X_and_Series_S"
+      },
+      {
+        name: { en: "Sony WH-1000XM5", az: "Sony WH-1000XM5 Qulaqlıq", ru: "Наушники Sony WH-1000XM5" },
+        priceUSD: 399,
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Sony_WH-1000XM5"
+      },
+      {
+        name: { en: "HP Spectre x360", az: "HP Spectre x360 Noutbuk", ru: "Ноутбук HP Spectre x360" },
+        priceUSD: 1299,
+        image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGFwdG9wfGVufDB8fDB8fHww&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/HP_Spectre"
+      },
+      {
+        name: { en: "Garmin Fenix 7", az: "Garmin Fenix 7 Saat", ru: "Часы Garmin Fenix 7" },
+        priceUSD: 699,
+        image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c21hcnQlMjB3YXRjaHxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Garmin_Fenix"
+      },
+      {
+        name: { en: "Dell XPS 13", az: "Dell XPS 13 Noutbuk", ru: "Ноутбук Dell XPS 13" },
+        priceUSD: 1199,
+        image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bGFwdG9wfGVufDB8fDB8fHww&w=1000&q=80",
+        wiki: "https://en.wikipedia.org/wiki/Dell_XPS"
+      }
+    );
+
+    function handleSearch() {
+      const lang = document.getElementById("language-select").value;
+      const val = document.getElementById("search").value.toLowerCase();
+      const keywordsByLang = {
+        en: ["iphone", "macbook", "samsung", "playstation", "asus", "dji", "nintendo", "bose", "lg", "logitech", "ipad", "meta", "canon", "razer", "amazon", "xbox", "sony", "hp", "garmin", "dell", "xiaomi"],
+        az: ["iphone", "macbook", "samsung", "playstation", "asus", "dji", "nintendo", "bose", "lg", "logitech", "ipad", "meta", "canon", "razer", "amazon", "xbox", "sony", "hp", "garmin", "dell", "xiaomi"],
+        ru: ["iphone", "macbook", "samsung", "playstation", "asus", "dji", "nintendo", "bose", "lg", "logitech", "ipad", "meta", "canon", "razer", "amazon", "xbox", "sony", "hp", "garmin", "dell", "xiaomi"]
+      };
+      const keywords = keywordsByLang[lang];
+      const valid = keywords.some(k => val.includes(k));
+      document.getElementById("notification").style.display = valid ? "none" : "block";
+    }
+    
+    const toggle = document.getElementById("theme-toggle-checkbox");
+    toggle.addEventListener("change", () => {
+      document.body.classList.toggle("light");
+    });
+  </script>
+</body>
+</html>
